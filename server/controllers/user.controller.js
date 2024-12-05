@@ -1,6 +1,7 @@
 const Puser = require("../models/user.model");
 const bcryptjs = require("bcryptjs");
 const Trycatch = require("../utils/trycatch");
+const generateToken = require("../utils/generateToken");
 
 const registerUser = async (req, res) => {
   try {
@@ -43,6 +44,8 @@ const loginuser = Trycatch(async (req, res) => {
   if (!comparepassword) {
     return res.status(400).json({ message: "Wrong password" });
   }
+
+  generateToken(user._id, res);
 
   // If password matches, send success response
   return res.status(200).json({
