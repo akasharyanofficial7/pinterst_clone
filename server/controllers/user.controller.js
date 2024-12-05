@@ -1,5 +1,6 @@
 const Puser = require("../models/user.model");
 const bcryptjs = require("bcryptjs");
+const Trycatch = require("../utils/trycatch");
 
 const registerUser = async (req, res) => {
   try {
@@ -28,7 +29,29 @@ const registerUser = async (req, res) => {
     });
   }
 };
+const loginuser = Trycatch(async (req, res) => {
+  const { email, password } = req.body;
+
+  // Check if user exists
+  const user = await Puser.findOne({ email });
+  if (!user) {
+    return res.status(400).json({ message: "User not found on this email" });
+  }
+
+  // Compare the password
+  const comparepassword = await bcryptjs.compare(password, user.password);
+  if (!comparepassword) {
+    return res.status(400).json({ message: "Wrong password" });
+  }
+
+  // If password matches, send success response
+  return res.status(200).json({
+    message: "Login successful",
+    user,
+  });
+});
 
 module.exports = {
   registerUser,
+  loginuser,
 };
